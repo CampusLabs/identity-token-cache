@@ -9,6 +9,8 @@ namespace CampusLabs.Identity.Tokens.Cache
 {
     public class RedisTokenReplayCache : TokenReplayCache
     {
+        public event EventHandler<Exception> Error;
+
         private static readonly Lazy<ConnectionMultiplexer> LazyConnection = new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect(_connectionString));
 
         public static ConnectionMultiplexer Connection => LazyConnection.Value;
@@ -17,9 +19,10 @@ namespace CampusLabs.Identity.Tokens.Cache
 
         public override void LoadCustomConfiguration(XmlNodeList nodelist)
         {
-            if (nodelist != null && nodelist.Count > 0 && nodelist[0] != null && nodelist[0].Name.Equals("redisCache", StringComparison.InvariantCultureIgnoreCase) && nodelist[0].Attributes?["connectionString"] != null)
+            if (nodelist != null && nodelist.Count > 0 && nodelist[0] != null && nodelist[0].Name.Equals("redisCache", StringComparison.InvariantCultureIgnoreCase))
             {
-                _connectionString = nodelist[0].Attributes["connectionString"].Value;
+                if (nodelist[0].Attributes?["connectionString"] != null)
+                    _connectionString = nodelist[0].Attributes["connectionString"].Value;
             }
 
             if (string.IsNullOrWhiteSpace(_connectionString))
@@ -29,32 +32,64 @@ namespace CampusLabs.Identity.Tokens.Cache
 
         public override void AddOrUpdate(string key, SecurityToken securityToken, DateTime expirationTime)
         {
-            var timeSpan = expirationTime - DateTime.Now;
+            try
+            {
+                var timeSpan = expirationTime - DateTime.Now;
 
-            var cache = Connection.GetDatabase();
+                var cache = Connection.GetDatabase();
 
-            cache.StringSet(key, JsonConvert.SerializeObject(securityToken), timeSpan, When.Always, CommandFlags.FireAndForget);
+                cache.StringSet(key, JsonConvert.SerializeObject(securityToken), timeSpan, When.Always, CommandFlags.FireAndForget);
+            }
+            catch (Exception e)
+            {
+                Error?.Invoke(this, e);
+            }
         }
 
         public override bool Contains(string key)
         {
-            var cache = Connection.GetDatabase();
+            try
+            {
+                var cache = Connection.GetDatabase();
 
-            return cache.KeyExists(key);
+                return cache.KeyExists(key);
+            }
+            catch (Exception e)
+            {
+                Error?.Invoke(this, e);
+
+                return false;
+            }
         }
 
         public override SecurityToken Get(string key)
         {
-            var cache = Connection.GetDatabase();
+            try
+            {
+                var cache = Connection.GetDatabase();
 
-            return JsonConvert.DeserializeObject<SecurityToken>(cache.StringGet(key));
+                return JsonConvert.DeserializeObject<SecurityToken>(cache.StringGet(key));
+            }
+            catch (Exception e)
+            {
+                Error?.Invoke(this, e);
+
+                return null;
+            }
         }
 
         public override void Remove(string key)
         {
-            var cache = Connection.GetDatabase();
+            try
+            {
+                var cache = Connection.GetDatabase();
 
-            cache.KeyDelete(key);
+                cache.KeyDelete(key);
+            }
+            catch (Exception e)
+            {
+                Error?.Invoke(this, e);
+            }
         }
     }
 }
