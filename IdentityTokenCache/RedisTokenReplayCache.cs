@@ -9,7 +9,7 @@ namespace CampusLabs.Identity.Tokens.Cache
 {
     public class RedisTokenReplayCache : TokenReplayCache
     {
-        public event EventHandler<Exception> Error;
+        public event EventHandler<Exception> NoticeError;
 
         private static readonly Lazy<ConnectionMultiplexer> LazyConnection = new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect(_connectionString));
 
@@ -42,7 +42,7 @@ namespace CampusLabs.Identity.Tokens.Cache
             }
             catch (Exception e)
             {
-                Error?.Invoke(this, e);
+                NoticeError?.Invoke(this, e);
             }
         }
 
@@ -56,7 +56,7 @@ namespace CampusLabs.Identity.Tokens.Cache
             }
             catch (Exception e)
             {
-                Error?.Invoke(this, e);
+                NoticeError?.Invoke(this, e);
 
                 return false;
             }
@@ -72,7 +72,7 @@ namespace CampusLabs.Identity.Tokens.Cache
             }
             catch (Exception e)
             {
-                Error?.Invoke(this, e);
+                NoticeError?.Invoke(this, e);
 
                 return null;
             }
@@ -88,7 +88,7 @@ namespace CampusLabs.Identity.Tokens.Cache
             }
             catch (Exception e)
             {
-                Error?.Invoke(this, e);
+                NoticeError?.Invoke(this, e);
             }
         }
     }
