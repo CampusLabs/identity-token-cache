@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+  <system.identityModel xdt:Transform="InsertIfMissing">
+    <identityConfiguration xdt:Transform="InsertIfMissing">
+      <tokenReplayDetection xdt:Transform="InsertIfMissing" enabled="true" />
+      <caches xdt:Transform="InsertIfMissing">
+        <tokenReplayCache xdt:Transform="InsertIfMissing" type="CampusLabs.Identity.Tokens.Cache.RedisTokenReplayCache, CampusLabs.Identity.Tokens.Cache">
+          <!--<redisCache connectionString="<<insert redis connection string>>" />-->
+        </tokenReplayCache>
+      </caches>
+    </identityConfiguration>
+  </system.identityModel>
+</configuration>
