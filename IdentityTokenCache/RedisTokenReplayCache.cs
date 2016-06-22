@@ -9,13 +9,15 @@ namespace CampusLabs.Identity.Tokens.Cache
 {
     public class RedisTokenReplayCache : TokenReplayCache
     {
-        public event EventHandler<Exception> NoticeError;
-
-        private static readonly Lazy<ConnectionMultiplexer> LazyConnection = new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect(_connectionString));
-
-        public static ConnectionMultiplexer Connection => LazyConnection.Value;
+        private const string Prefix = "trc_";
 
         private static string _connectionString;
+
+        private static readonly Lazy<ConnectionMultiplexer> LazyConnection = new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect(_connectionString));
+        
+        public static ConnectionMultiplexer Connection => LazyConnection.Value;
+
+        public event EventHandler<Exception> NoticeError;
 
         public override void LoadCustomConfiguration(XmlNodeList nodelist)
         {
@@ -38,7 +40,7 @@ namespace CampusLabs.Identity.Tokens.Cache
 
                 var cache = Connection.GetDatabase();
 
-                cache.StringSet(key, JsonConvert.SerializeObject(securityToken), timeSpan, When.Always, CommandFlags.FireAndForget);
+                cache.StringSet(GetKeyWithPrefix(key), JsonConvert.SerializeObject(securityToken), timeSpan, When.Always, CommandFlags.FireAndForget);
             }
             catch (Exception e)
             {
@@ -52,7 +54,7 @@ namespace CampusLabs.Identity.Tokens.Cache
             {
                 var cache = Connection.GetDatabase();
 
-                return cache.KeyExists(key);
+                return cache.KeyExists(GetKeyWithPrefix(key));
             }
             catch (Exception e)
             {
@@ -68,7 +70,7 @@ namespace CampusLabs.Identity.Tokens.Cache
             {
                 var cache = Connection.GetDatabase();
 
-                return JsonConvert.DeserializeObject<SecurityToken>(cache.StringGet(key));
+                return JsonConvert.DeserializeObject<SecurityToken>(cache.StringGet(GetKeyWithPrefix(key)));
             }
             catch (Exception e)
             {
@@ -84,12 +86,17 @@ namespace CampusLabs.Identity.Tokens.Cache
             {
                 var cache = Connection.GetDatabase();
 
-                cache.KeyDelete(key);
+                cache.KeyDelete(GetKeyWithPrefix(key));
             }
             catch (Exception e)
             {
                 NoticeError?.Invoke(this, e);
             }
+        }
+
+        private static string GetKeyWithPrefix(string key)
+        {
+            return Prefix + key;
         }
     }
 }
