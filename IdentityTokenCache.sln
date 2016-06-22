@@ -5,9 +5,10 @@ VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityTokenCache", "IdentityTokenCache\IdentityTokenCache.csproj", "{146B1103-26CC-410C-807F-CFA4F8245540}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Package", "Package", "{C50CC2A8-2283-4899-8FEF-E155E313CC9B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FDDD2955-69A4-4752-B4C9-C55F61BDECEB}"
 	ProjectSection(SolutionItems) = preProject
-		CL.Identity.Tokens.Cache.1.0.0.1.nupkg = CL.Identity.Tokens.Cache.1.0.0.1.nupkg
+		LICENSE.md = LICENSE.md
+		README.md = README.md
 	EndProjectSection
 EndProject
 Global
