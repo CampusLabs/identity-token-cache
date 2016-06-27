@@ -8,8 +8,7 @@ PM> Install-Package CL.Identity.Tokens.Cache -Pre
 
 ### Configuration
 
-- Enable "tokenReplayDetection"
-- Add redisCache configuration
+The nuget package should enable "tokenReplayDetection", and add the caches/tokenReplayCache/redisCache configuration. All should have to do is specify the connectionString property on the redisCache configuration. 
 
 ```XML
   <system.identityModel>
